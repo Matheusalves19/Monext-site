@@ -153,25 +153,84 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ===============================
-  // 🔁 EVENTOS DA TABELA
-  // ===============================
-  document.getElementById("tabelaClientes")?.addEventListener("click", e => {
-    const btn = e.target.closest("button");
-    if (!btn) return;
+// 🔁 EVENTOS DA TABELA (todos os botões)
+// ===============================
+document.getElementById("tabelaClientes")?.addEventListener("click", e => {
+  const btn = e.target.closest("button");
+  if (!btn) return;
 
-    const id = parseInt(btn.dataset.id);
+  const id = parseInt(btn.dataset.id);
+  const cliente = clientes.find(c => c.id === id);
+  if (!cliente) return;
 
-    if (btn.classList.contains("btn-excluir")) {
-      const senha = prompt("Senha admin:");
-      if (senha === senhaAdmin) {
-        clientes = clientes.filter(c => c.id !== id);
-        localStorage.setItem("clientes", JSON.stringify(clientes));
-        renderizarClientes();
-      } else {
-        alert("Senha incorreta!");
-      }
+  // ❌ EXCLUIR
+  if (btn.classList.contains("btn-excluir")) {
+    const senha = prompt("Senha admin:");
+    if (senha === senhaAdmin) {
+      clientes = clientes.filter(c => c.id !== id);
+      localStorage.setItem("clientes", JSON.stringify(clientes));
+      renderizarClientes();
+      alert("Cliente excluído!");
+    } else {
+      alert("Senha incorreta!");
     }
-  });
+  }
+
+  // ➕ NOVO EMPRÉSTIMO
+  if (btn.classList.contains("btn-novo")) {
+    const valor = prompt("Valor do empréstimo R$:");
+    if (!valor || isNaN(valor)) return alert("Valor inválido!");
+    const juros = prompt("Juros (%)") || "0";
+    const parcelas = prompt("Número de parcelas") || "1";
+
+    cliente.emprestimos = cliente.emprestimos || [];
+    cliente.emprestimos.push({
+      valor: parseFloat(valor),
+      juros: parseFloat(juros),
+      parcelas: Array.from({ length: parseInt(parcelas) }, (_, i) => ({
+        numero: i + 1,
+        valor: parseFloat(valor) / parseInt(parcelas),
+        pago: false
+      }))
+    });
+
+    cliente.dataUltimaAlteracao = new Date().toLocaleString("pt-BR");
+    localStorage.setItem("clientes", JSON.stringify(clientes));
+    renderizarClientes();
+    alert("Empréstimo adicionado!");
+  }
+
+  // ✏️ EDITAR CLIENTE
+  if (btn.classList.contains("btn-editar")) {
+    const novoNome = prompt("Novo nome do cliente:", cliente.nome);
+    if (!novoNome) return;
+
+    const novoCPF = prompt("Novo CPF (somente números):", cliente.cpf);
+    if (!novoCPF || !validarCPF(novoCPF)) return alert("CPF inválido!");
+
+    cliente.nome = novoNome;
+    cliente.cpf = novoCPF.replace(/\D/g, "");
+    cliente.dataUltimaAlteracao = new Date().toLocaleString("pt-BR");
+
+    localStorage.setItem("clientes", JSON.stringify(clientes));
+    renderizarClientes();
+    alert("Cliente atualizado!");
+  }
+
+  // 📋 DETALHES
+  if (btn.classList.contains("btn-detalhes")) {
+    let detalhes = `Nome: ${cliente.nome}\nCPF: ${formatarCPF(cliente.cpf)}\nDivida: R$ ${cliente.divida.toFixed(2)}\n\nEmpréstimos:\n`;
+    if (cliente.emprestimos?.length) {
+      cliente.emprestimos.forEach((emp, i) => {
+        detalhes += `Empréstimo ${i + 1}: R$ ${emp.valor.toFixed(2)}, Juros: ${emp.juros}%, Parcelas: ${emp.parcelas.length}\n`;
+      });
+    } else {
+      detalhes += "Nenhum empréstimo.";
+    }
+    alert(detalhes);
+  }
+});
+
 
   // ===============================
   // 🔍 PESQUISA
@@ -197,3 +256,4 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
 });
+
