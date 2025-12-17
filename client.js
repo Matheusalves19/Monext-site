@@ -2,7 +2,10 @@
 const sessao = JSON.parse(localStorage.getItem("usuarioLogado") || "{}");
 const usuario = sessao.nome;
 const senhaUsuario = sessao.senha;
-const idCaixa = parseInt(localStorage.getItem("idCaixa") || sessao.idCaixa || "0");
+
+// Recupera idCaixa de localStorage ou da sessão
+let idCaixa = localStorage.getItem("idCaixa") || sessao.idCaixa;
+if (idCaixa) idCaixa = parseInt(idCaixa);
 
 // 🔗 Integração com o caixa
 let saldoCaixa = parseFloat(localStorage.getItem("saldoCaixa") || "0");
@@ -128,7 +131,6 @@ function abrirModalEmprestimo(id) {
   const modalEl = document.getElementById("modalEmprestimo");
   new bootstrap.Modal(modalEl).show();
 
-  // Corrige backdrop travado
   modalEl.addEventListener('hidden.bs.modal', () => {
     document.body.classList.remove('modal-open');
     document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
@@ -204,7 +206,7 @@ document.getElementById("btnSalvarEmprestimo").addEventListener("click", () => {
   cliente.dataUltimaAlteracao = new Date().toLocaleString("pt-BR");
   localStorage.setItem("clientes", JSON.stringify(clientes));
 
-  // 🔽 Subtrai valor original do saldo atual (desconsiderando juros)
+  // Subtrai valor original do saldo atual
   saldoCaixa -= valor;
   atualizarSaldo();
 
@@ -301,7 +303,7 @@ function pagarParcela(clienteId, emprestimoId, numeroParcela) {
 
   parcela.pago = true;
 
-  // 🔽 Adiciona ao saldo o valor da parcela (com juros)
+  // Adiciona ao saldo o valor da parcela
   saldoCaixa += parcela.valor;
   atualizarSaldo();
 
