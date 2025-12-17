@@ -1,11 +1,12 @@
 // Recupera dados da sessão
 const sessao = JSON.parse(localStorage.getItem("usuarioLogado") || "{}");
-const usuario = sessao.nome;
-const senhaUsuario = sessao.senha;
+const usuario = sessao?.nome || null;
+const senhaUsuario = sessao?.senha || null;
 
 // Recupera idCaixa de localStorage ou da sessão
-let idCaixa = localStorage.getItem("idCaixa") || sessao.idCaixa;
+let idCaixa = localStorage.getItem("idCaixa") || sessao?.idCaixa;
 if (idCaixa) idCaixa = parseInt(idCaixa);
+else idCaixa = null; // garante valor nulo se não existir
 
 // 🔗 Integração com o caixa
 let saldoCaixa = parseFloat(localStorage.getItem("saldoCaixa") || "0");
@@ -13,15 +14,19 @@ let caixaAberto = localStorage.getItem("caixaAberto") === "true";
 
 // Validação de sessão
 if (!usuario || !senhaUsuario || !idCaixa) {
+  // Redireciona para login sem quebrar
+  localStorage.removeItem("usuarioLogado");
+  localStorage.removeItem("idCaixa");
   alert("Sessão expirada. Faça login novamente.");
   window.location.href = "index.html";
 }
 
 // Recupera clientes
-let clientes = JSON.parse(localStorage.getItem("clientes")) || [];
+let clientes = JSON.parse(localStorage.getItem("clientes") || "[]");
 
 // Senha de admin
 const senhaAdmin = "admin";
+
 
 // Função para validar CPF
 function validarCPF(cpf) {
@@ -401,3 +406,4 @@ document.getElementById("tabelaClientes").addEventListener("click", e => {
 // Inicializa tabela
 renderizarClientes();
 atualizarSaldo();
+
