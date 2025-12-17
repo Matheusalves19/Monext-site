@@ -392,7 +392,7 @@ function excluirCliente(id) {
 document.getElementById("pesquisa-cliente").addEventListener("input", e => renderizarClientes(e.target.value));
 
 // Voltar
-document.getElementById("btnVoltar").addEventListener("click", () => window.location.href = "painel.html");
+document.getElementById("btnVoltar").addEventListener("click", () => window.location.href = "index.html");
 
 // Event delegation para os botões dinâmicos da tabela
 document.getElementById("tabelaClientes").addEventListener("click", e => {
