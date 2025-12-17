@@ -11,7 +11,7 @@ let caixaAberto = localStorage.getItem("caixaAberto") === "true";
 // Validação de sessão
 if (!usuario || !senhaUsuario || !idCaixa) {
   alert("Sessão expirada. Faça login novamente.");
-  window.location.href = "login.html";
+  window.location.href = "index.html";
 }
 
 // Recupera clientes
@@ -399,3 +399,4 @@ document.getElementById("tabelaClientes").addEventListener("click", e => {
 // Inicializa tabela
 renderizarClientes();
 atualizarSaldo();
+
