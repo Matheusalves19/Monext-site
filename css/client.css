@@ -1,0 +1,54 @@
+body {
+  background: #f4f4f4;
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 15px;
+}
+
+.clientes-container {
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: auto; //aqui regula a largura da pagina estava 600px
+  text-align: center;
+}
+
+.clientes-container h3 {
+  margin-bottom: 20px;
+}
+
+.acoes-cliente button {
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+table {
+  font-size: 0.9rem;
+  margin-bottom: 0;
+}
+
+thead th {
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 576px) {
+  .acoes-cliente button {
+    width: 100%;
+    margin-bottom: 5px;
+  }
+
+  #pesquisa-cliente {
+    width: 100% !important;
+    margin: 5px 0;
+  }
+}

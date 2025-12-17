@@ -1,0 +1,91 @@
+/* =========================
+   Reset básico e login
+========================= */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: "Poppins", Arial, sans-serif;
+  background: linear-gradient(135deg, #e3f2fd, #f4f4f4);
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 15px;
+}
+
+/* Login */
+.login-container {
+  background: #ffffff;
+  padding: 35px 28px;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  width: 100%;
+  max-width: 360px;
+  transition: all 0.3s ease;
+}
+
+.login-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+.login-logo {
+  width: 170px;
+  max-width: 45vw;
+  margin-bottom: 25px;
+}
+
+input {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 15px;
+  border: 1px solid #d3d3d3;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus {
+  border-color: #0077ff;
+  box-shadow: 0 0 0 3px rgba(0, 119, 255, 0.15);
+  outline: none;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  background-color: #0077ff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 1rem;
+  letter-spacing: 0.3px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background-color: #005fdb;
+  transform: translateY(-1px);
+}
+
+/* Responsividade para login */
+@media (max-width: 360px) {
+  .login-container {
+    padding: 25px 18px;
+  }
+
+  .login-logo {
+    width: 90px;
+  }
+}
