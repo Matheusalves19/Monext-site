@@ -127,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function logout() {
         localStorage.removeItem("usuarioLogado");
         localStorage.removeItem("caixaAberto");
-        window.location.href = "Login.html";
+        window.location.href = "index.html";
     }
 
     // ⏰ Data e hora
@@ -279,4 +279,5 @@ document.addEventListener("DOMContentLoaded", () => {
     // Inicializa
     atualizarStatus();
 });
+
 
