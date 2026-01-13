@@ -47,15 +47,26 @@ btnLogin.addEventListener("click", async () => {
             const doc = querySnapshot.docs[0];
             const dados = doc.data();
 
+            // Normaliza o perfil: remove espaços e coloca tudo em minúsculo
+            const perfilUsuario = (dados.Perfil || "Usuario").trim().toLowerCase();
+
+            // Salva no localStorage
             localStorage.setItem("usuarioLogado", JSON.stringify({
                 id: doc.id,
                 nome: dados.Nome,
-                senha: dados.Senha,       // vem do Firestore
-                rp: dados.RP || "—",       // 👈 Adicionado RP
-                idCaixa: dados.idCaixa
+                senha: dados.Senha,
+                rp: dados.RP || "—",
+                idCaixa: dados.idCaixa,
+                perfil: perfilUsuario
             }));
 
-            window.location.href = "painel.html";
+            // Redireciona conforme perfil
+            if (perfilUsuario === "admin") {
+                window.location.href = "painel_admin.html";
+            } else {
+                window.location.href = "painel.html";
+            }
+
         } else {
             mostrarErro("Nome ou senha inválidos.");
         }
