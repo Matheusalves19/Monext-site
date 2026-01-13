@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Painel Administrativo</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #eef2f7, #f9fafb);
+            margin: 0;
+            padding: 25px;
+            color: #333;
+        }
+
+        h1 {
+            margin-bottom: 25px;
+            display: inline-block;
+        }
+
+        #btnLogout {
+            float: right;
+            background-color: #c62828;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        #btnLogout:hover {
+            background-color: #b71c1c;
+        }
+
+        .caixas {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 18px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .card-header h2 {
+            font-size: 20px;
+            margin: 0;
+        }
+
+        /* STATUS */
+        .status {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #fff;
+            animation: pulse 1.5s infinite;
+        }
+
+        .status.aberto {
+            background-color: #2e7d32;
+            box-shadow: 0 0 10px rgba(46, 125, 50, 0.7);
+        }
+
+        .status.fechado {
+            background-color: #c62828;
+            box-shadow: 0 0 10px rgba(198, 40, 40, 0.7);
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.05);
+                opacity: .7;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .valores {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .valor-box {
+            background: #f4f7fb;
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .valor-box i {
+            font-size: 18px;
+            margin-bottom: 4px;
+            color: #1976d2;
+        }
+
+        .valor-box .label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .valor-box .valor {
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 3px;
+        }
+
+        @media (max-width: 500px) {
+            .valores {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <center><h1>Painel Administrativo – Visão Geral</h1>
+    <button id="btnLogout">Logout</button></center>
+
+    <div class="caixas" id="caixasContainer"></div>
+
+    <script>
+        // 🔒 VERIFICA SE USUÁRIO ESTÁ LOGADO
+        const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
+        if (!usuarioLogado) {
+            window.location.href = "login.html"; // Redireciona se não estiver logado
+        }
+
+        // 🔢 GERAR 11 CAIXAS DE EXEMPLO
+        const caixas = Array.from({ length: 11 }, (_, i) => ({
+            nome: `RP ${String(i + 1).padStart(3, '0')}`,
+            status: Math.random() > 0.3 ? "ABERTO" : "FECHADO",
+            saldoAtual: Math.random() * 20000 + 5000,
+            recebidoDia: Math.random() * 3000,
+            emprestado: Math.random() * 5000
+        }));
+
+        const container = document.getElementById("caixasContainer");
+
+        const formatarMoeda = valor =>
+            valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+        caixas.forEach(caixa => {
+            const card = document.createElement("div");
+            card.className = "card";
+
+            card.innerHTML = `
+            <div class="card-header">
+                <h2>${caixa.nome}</h2>
+                <span class="status ${caixa.status === 'ABERTO' ? 'aberto' : 'fechado'}">
+                    ${caixa.status}
+                </span>
+            </div>
+
+            <div class="valores">
+                <div class="valor-box">
+                    <i class="fa-solid fa-wallet"></i>
+                    <div class="label">Saldo Atual</div>
+                    <div class="valor">${formatarMoeda(caixa.saldoAtual)}</div>
+                </div>
+
+                <div class="valor-box">
+                    <i class="fa-solid fa-arrow-trend-up"></i>
+                    <div class="label">Recebido Hoje</div>
+                    <div class="valor">${formatarMoeda(caixa.recebidoDia)}</div>
+                </div>
+
+                <div class="valor-box">
+                    <i class="fa-solid fa-hand-holding-dollar"></i>
+                    <div class="label">Emprestado</div>
+                    <div class="valor">${formatarMoeda(caixa.emprestado)}</div>
+                </div>
+            </div>
+        `;
+
+            container.appendChild(card);
+        });
+
+        // 🔒 Logout
+        document.getElementById("btnLogout").addEventListener("click", () => {
+            localStorage.removeItem("usuarioLogado"); // remove login
+            window.location.href = "login.html"; // redireciona para login
+        });
+    </script>
+
+</body>
+
+</html>
