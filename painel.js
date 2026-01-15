@@ -120,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("Abra o caixa antes de acessar os clientes!");
             return;
         }
-        window.location.href = "clientes.html";
+        window.location.href = "./clientes.html";
     }
 
     // 🚪 Logout
@@ -279,3 +279,4 @@ document.addEventListener("DOMContentLoaded", () => {
     // Inicializa
     atualizarStatus();
 });
+
