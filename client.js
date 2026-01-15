@@ -3,14 +3,13 @@
 // ================================
 const sessao = JSON.parse(localStorage.getItem("usuarioLogado"));
 
-if (!sessao || !sessao.nome || !sessao.senha || !sessao.idCaixa) {
+if (!sessao || !sessao.nome || !sessao.senha) {
   alert("Sessão expirada. Faça login novamente.");
   window.location.href = "index.html";
 }
 
 const usuario = sessao.nome;
 const senhaUsuario = sessao.senha;
-const idCaixa = parseInt(sessao.idCaixa);
 
 // ================================
 // 🔗 Integração com o caixa
@@ -70,12 +69,9 @@ function renderizarClientes(filtro = "") {
   tabela.innerHTML = "";
 
   const filtrados = clientes.filter(c =>
-    c.caixaId === idCaixa &&
-    (
-      c.nome.toLowerCase().includes(filtro.toLowerCase()) ||
-      c.id.toString().includes(filtro) ||
-      c.cpf.includes(filtro.replace(/\D/g, ""))
-    )
+    c.nome.toLowerCase().includes(filtro.toLowerCase()) ||
+    c.id.toString().includes(filtro) ||
+    c.cpf.includes(filtro.replace(/\D/g, ""))
   );
 
   filtrados.forEach(c => {
