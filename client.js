@@ -1,44 +1,54 @@
-// ================================
-// 🔐 Recupera e valida sessão
-// ================================
+// =====================================================
+// 🔐 Recupera e valida sessão (CORRETO)
+// =====================================================
 const sessao = JSON.parse(localStorage.getItem("usuarioLogado"));
 
-if (!sessao || !sessao.nome || !sessao.senha || !sessao.idCaixa) {
+if (
+  !sessao ||
+  !sessao.nome ||
+  !sessao.senha ||
+  sessao.idCaixa === undefined ||
+  sessao.idCaixa === null
+) {
   alert("Sessão expirada. Faça login novamente.");
   window.location.href = "index.html";
+  throw new Error("Sessão inválida");
 }
 
 const usuario = sessao.nome;
 const senhaUsuario = sessao.senha;
-const idCaixa = parseInt(sessao.idCaixa);
+const idCaixa = Number(sessao.idCaixa);
 
-// ================================
+// =====================================================
 // 🔗 Integração com o caixa
-// ================================
+// =====================================================
 let saldoCaixa = parseFloat(localStorage.getItem("saldoCaixa") || "0");
 let caixaAberto = localStorage.getItem("caixaAberto") === "true";
 
-// ================================
+// =====================================================
 // 📦 Dados
-// ================================
+// =====================================================
 let clientes = JSON.parse(localStorage.getItem("clientes")) || [];
 const senhaAdmin = "admin";
 
-// ================================
+// =====================================================
 // 🧾 Funções utilitárias
-// ================================
+// =====================================================
 function validarCPF(cpf) {
   cpf = cpf.replace(/\D/g, "");
   if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
+
   let soma = 0;
   for (let i = 0; i < 9; i++) soma += parseInt(cpf.charAt(i)) * (10 - i);
   let resto = (soma * 10) % 11;
   if (resto === 10) resto = 0;
   if (resto !== parseInt(cpf.charAt(9))) return false;
+
   soma = 0;
   for (let i = 0; i < 10; i++) soma += parseInt(cpf.charAt(i)) * (11 - i);
   resto = (soma * 10) % 11;
   if (resto === 10) resto = 0;
+
   return resto === parseInt(cpf.charAt(10));
 }
 
@@ -62,9 +72,9 @@ function atualizarSaldo() {
   localStorage.setItem("saldoCaixa", saldoCaixa.toFixed(2));
 }
 
-// ================================
-// 📋 Renderização
-// ================================
+// =====================================================
+// 📋 Renderizar clientes
+// =====================================================
 function renderizarClientes(filtro = "") {
   const tabela = document.getElementById("tabelaClientes");
   tabela.innerHTML = "";
@@ -80,8 +90,8 @@ function renderizarClientes(filtro = "") {
 
   filtrados.forEach(c => {
     calcularDivida(c);
-    const tr = document.createElement("tr");
 
+    const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${c.id}</td>
       <td>${c.nome}</td>
@@ -101,9 +111,9 @@ function renderizarClientes(filtro = "") {
   });
 }
 
-// ================================
+// =====================================================
 // 💰 Empréstimos
-// ================================
+// =====================================================
 function abrirModalEmprestimo(id) {
   document.getElementById("clienteIdEmprestimo").value = id;
   document.getElementById("parcelasEmprestimo").value = 1;
@@ -112,67 +122,86 @@ function abrirModalEmprestimo(id) {
 }
 
 document.getElementById("btnSalvarEmprestimo").addEventListener("click", () => {
-  const id = parseInt(document.getElementById("clienteIdEmprestimo").value);
+  const id = Number(document.getElementById("clienteIdEmprestimo").value);
   const valor = parseFloat(document.getElementById("valorEmprestimo").value);
   const juros = parseFloat(document.getElementById("jurosEmprestimo").value);
-  const parcelas = parseInt(document.getElementById("parcelasEmprestimo").value);
+  const parcelas = Number(document.getElementById("parcelasEmprestimo").value);
   const senha = document.getElementById("senhaEmprestimo").value;
 
   const cliente = clientes.find(c => c.id === id);
-  if (!cliente || senha !== senhaUsuario) return alert("Senha incorreta!");
+  if (!cliente) return;
+
+  if (senha !== senhaUsuario) return alert("Senha incorreta!");
 
   const total = valor + (valor * juros / 100);
-  const parcelaValor = parseFloat((total / parcelas).toFixed(2));
+  const valorParcela = parseFloat((total / parcelas).toFixed(2));
 
-  const emp = {
+  const emprestimo = {
     id: Date.now(),
     valorOriginal: valor,
     juros,
     totalComJuros: total,
-    parcelas: Array.from({ length: parcelas }, (_, i) => ({
-      numero: i + 1,
-      valor: parcelaValor,
-      pago: false
-    }))
+    parcelas: [],
+    dataEmprestimo: new Date().toLocaleString("pt-BR")
   };
 
-  cliente.emprestimos = cliente.emprestimos || [];
-  cliente.emprestimos.push(emp);
-  saldoCaixa -= valor;
+  for (let i = 0; i < parcelas; i++) {
+    emprestimo.parcelas.push({
+      numero: i + 1,
+      valor: valorParcela,
+      pago: false
+    });
+  }
 
+  cliente.emprestimos = cliente.emprestimos || [];
+  cliente.emprestimos.push(emprestimo);
+  cliente.dataUltimaAlteracao = new Date().toLocaleString("pt-BR");
+
+  saldoCaixa -= valor;
   atualizarSaldo();
+
   localStorage.setItem("clientes", JSON.stringify(clientes));
   renderizarClientes();
+
   bootstrap.Modal.getInstance(document.getElementById("modalEmprestimo")).hide();
 });
 
-// ================================
+// =====================================================
 // 🔍 Pesquisa / Voltar
-// ================================
+// =====================================================
 document.getElementById("pesquisa-cliente")
   .addEventListener("input", e => renderizarClientes(e.target.value));
 
 document.getElementById("btnVoltar")
   .addEventListener("click", () => window.location.href = "painel.html");
 
-// ================================
-// 🎯 Eventos dinâmicos
-// ================================
+// =====================================================
+// 🎯 Ações da tabela
+// =====================================================
 document.getElementById("tabelaClientes").addEventListener("click", e => {
-  const id = e.target.closest("button")?.dataset.id;
-  if (!id) return;
+  const btn = e.target.closest("button");
+  if (!btn) return;
 
-  if (e.target.closest(".btn-novo")) abrirModalEmprestimo(+id);
-  else if (e.target.closest(".btn-excluir")) {
-    if (prompt("Senha ADMIN:") === senhaAdmin) {
-      clientes = clientes.filter(c => c.id !== +id);
+  const id = Number(btn.dataset.id);
+
+  if (btn.classList.contains("btn-novo")) {
+    abrirModalEmprestimo(id);
+  }
+
+  if (btn.classList.contains("btn-excluir")) {
+    const senha = prompt("Senha do ADMIN:");
+    if (senha === senhaAdmin) {
+      clientes = clientes.filter(c => c.id !== id);
       localStorage.setItem("clientes", JSON.stringify(clientes));
       renderizarClientes();
+    } else {
+      alert("Senha incorreta!");
     }
   }
 });
 
-// ================================
+// =====================================================
 // ▶ Inicialização
-// ================================
+// =====================================================
 renderizarClientes();
+atualizarSaldo();
