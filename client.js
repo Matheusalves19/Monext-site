@@ -7,8 +7,7 @@ if (
   !sessao ||
   !sessao.nome ||
   !sessao.senha ||
-  sessao.idCaixa === undefined ||
-  sessao.idCaixa === null
+  !sessao.perfil
 ) {
   alert("Sessão expirada. Faça login novamente.");
   window.location.href = "index.html";
@@ -17,7 +16,11 @@ if (
 
 const usuario = sessao.nome;
 const senhaUsuario = sessao.senha;
-const idCaixa = Number(sessao.idCaixa);
+const perfilUsuario = sessao.perfil;
+
+// idCaixa agora é OPCIONAL
+const idCaixa = Number(sessao.idCaixa || 0);
+
 
 // =====================================================
 // 🔗 Integração com o caixa
@@ -205,3 +208,4 @@ document.getElementById("tabelaClientes").addEventListener("click", e => {
 // =====================================================
 renderizarClientes();
 atualizarSaldo();
+
